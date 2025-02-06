@@ -1,18 +1,11 @@
 import asyncio
-import time
 from datetime import timedelta, datetime
-from operator import ifloordiv
-from pickletools import uint1
-from site import PREFIXES
-from types import NoneType
 
 import discord
-from discord.ui import RoleSelect
-from discord.utils import sleep_until
 
-from ChannelModel import ChannelModel
+from Models.ChannelModel import ChannelModel
+from Models.EventModel import EventModel
 from Event import events_in_range, next_sunday, Event
-from Model import Model
 
 PREFIX = "!connect"
 MINUTE = 60
@@ -82,9 +75,11 @@ class ConnectBot(discord.Client):
         sleep_until = next_sunday()
         sleep_until = sleep_until.replace(hour=16, minute=0, second=0, microsecond=0)
         sleep_until += timedelta(days=1)
+        sleep_until = datetime.strptime("2025-02-07 00:35", "%Y-%m-%d %H:%M")
         while True:
             await asyncio.sleep((sleep_until - datetime.now()).total_seconds())
-            sleep_until += timedelta(days=7)
+            #sleep_until += timedelta(days=7)
+            sleep_until += timedelta(seconds=30)
             print(f"Firing Event Manager cycle.")
 
             if not self.is_ready() or self.event_manager_channel is None:
@@ -97,7 +92,7 @@ class ConnectBot(discord.Client):
             else:
                 continue
 
-            with Model() as model:
+            with EventModel() as model:
                 events = events_in_range(
                     model.events,
                     datetime.now() + timedelta(days=7),
@@ -129,7 +124,7 @@ class ConnectBot(discord.Client):
             sleep_until += timedelta(days=1)
             print(f"Firing Shift cycle.")
             
-            with Model() as model:
+            with EventModel() as model:
                 events = events_in_range(model.events, datetime.now(), datetime.now() + timedelta(days=1))
             if self.is_ready() and self.shift_channel is not None:
                 crew_role = None

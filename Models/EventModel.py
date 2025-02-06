@@ -3,9 +3,9 @@ import csv
 
 from Event import create_event
 
-schedule_path = Path(__file__).parent.joinpath('schedule.csv').absolute()
+schedule_path = Path(__file__).parent.parent.joinpath('Data/schedule.csv').absolute()
 
-class Model:
+class EventModel:
     def __init__(self):
         self.events = []
     

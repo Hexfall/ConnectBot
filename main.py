@@ -1,13 +1,8 @@
-from collections import defaultdict
-from datetime import datetime, timedelta
-
 import discord
 import asyncio
 
 from pathlib import Path
 from ConnectBot import ConnectBot
-from Event import events_in_range, next_sunday
-from Model import Model
 
 token_path = Path(__file__).parent.joinpath("token.txt").absolute()
 

@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 
-channel_file = Path(__file__).parent.joinpath('channels.json')
+channel_file = Path(__file__).parent.parent.joinpath('Data/channels.json')
 
 class ChannelModel:
     def __init__(self):

@@ -1,4 +1,4 @@
 .idea
 __pycache__
 token.txt
-channels.json
+Data/channels.json
