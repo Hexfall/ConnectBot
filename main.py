@@ -1,7 +1,13 @@
+from collections import defaultdict
+from datetime import datetime, timedelta
+
 import discord
+import asyncio
 
 from pathlib import Path
 from ConnectBot import ConnectBot
+from Event import events_in_range, next_sunday
+from Model import Model
 
 token_path = Path(__file__).parent.joinpath("token.txt").absolute()
 
@@ -10,13 +16,24 @@ intents.message_content = True
 intents.members = True
 
 
-def main() -> None:
-    bot = ConnectBot(intents)
-    bot.run(get_token())
+async def main() -> None:
+    bot = ConnectBot(intents=intents)
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(
+            bot.start(get_token())
+        )
+        tg.create_task(
+            bot.event_manager_cycle()
+        )
+        tg.create_task(
+            bot.shift_cycle()
+        )
+        
 
 def get_token() -> str:
     with open(token_path, 'r') as file:
         return file.read().strip()
+        
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
