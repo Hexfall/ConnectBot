@@ -95,8 +95,8 @@ class ConnectBot(discord.Client):
             with EventModel() as model:
                 events = events_in_range(
                     model.events,
-                    datetime.now() + timedelta(days=7),
-                    datetime.now() + timedelta(days=14)
+                    next_sunday(),
+                    next_sunday() + timedelta(days=7)
                 )
             
             if len(events) == 0:
