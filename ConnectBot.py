@@ -5,6 +5,7 @@ import discord
 
 from Models.ChannelModel import ChannelModel
 from Models.EventModel import EventModel
+from Models.IntroModel import IntroModel
 from Event import events_in_range, next_sunday, Event
 
 PREFIX = "!connect"
@@ -75,11 +76,10 @@ class ConnectBot(discord.Client):
         sleep_until = next_sunday()
         sleep_until = sleep_until.replace(hour=16, minute=0, second=0, microsecond=0)
         sleep_until += timedelta(days=1)
-        sleep_until = datetime.strptime("2025-02-07 00:35", "%Y-%m-%d %H:%M")
+        #sleep_until = datetime.strptime("2025-02-07 00:35", "%Y-%m-%d %H:%M") # For debugging
         while True:
             await asyncio.sleep((sleep_until - datetime.now()).total_seconds())
-            #sleep_until += timedelta(days=7)
-            sleep_until += timedelta(seconds=30)
+            sleep_until += timedelta(days=7)
             print(f"Firing Event Manager cycle.")
 
             if not self.is_ready() or self.event_manager_channel is None:
@@ -119,6 +119,7 @@ class ConnectBot(discord.Client):
         sleep_until = sleep_until.replace(hour=16, minute=0, second=0, microsecond=0)
         if sleep_until < datetime.now():
             sleep_until += timedelta(days=1)
+        #sleep_until = datetime.strptime("2025-02-07 01:19", "%Y-%m-%d %H:%M") # For debugging
         while True:
             await asyncio.sleep((sleep_until - datetime.now()).total_seconds())
             sleep_until += timedelta(days=1)
@@ -151,7 +152,10 @@ class ConnectBot(discord.Client):
                                 break
                         else:
                             u2 = u
-                    
-                    await self.shift_channel.send(f"{random_intro(e)} {random_member_intro(u1.mention if u1 is not None else e.primary, u2.mention if u2 is not None else e.secondary)}")
+                    with IntroModel() as model:
+                        intro = model.get_event_intro(e.title)
+                        primary = model.get_primary_intro(u1.mention if u1 is not None else e.primary)
+                        secondary = model.get_secondary_intro(u2.mention if u2 is not None else e.secondary)
+                    await self.shift_channel.send(f"{intro} {primary} {secondary}")
                     
     

@@ -30,4 +30,4 @@ class ChannelModel:
             'event_manager_channel': self.event_manager_channel,
         }
         with open(channel_file, 'w') as f:
-            json.dump(d, f)
+            json.dump(d, f, indent=4)
