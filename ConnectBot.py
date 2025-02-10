@@ -111,10 +111,6 @@ class ConnectBot(discord.Client):
 
 
     async def shift_cycle(self) -> None:
-        def random_intro(event: Event):
-            return f"Tomorrow is {event.title} and "
-        def random_member_intro(p: str, s: str):
-            return f"{p} is on games and {s} is on snack duty."
         sleep_until = datetime.now()
         sleep_until = sleep_until.replace(hour=16, minute=0, second=0, microsecond=0)
         if sleep_until < datetime.now():
@@ -128,34 +124,32 @@ class ConnectBot(discord.Client):
             with EventModel() as model:
                 events = events_in_range(model.events, datetime.now(), datetime.now() + timedelta(days=1))
             if self.is_ready() and self.shift_channel is not None:
-                crew_role = None
-                for r in self.shift_channel.guild.roles:
-                    if r.name == "Crew":
-                        print("Found crew role")
-                        crew_role = r
-                        break
-                if crew_role is None:
-                    continue
                 for e in events:
-                    u1, u2 = None, None
-                    for u in self.shift_channel.guild.members:
-                        if not crew_role in u.roles:
-                            continue
-                        name = u.nick.lower() if u.nick is not None else u.name.lower()
-                        for n in e.primary.split():
-                            if not n.lower() in name:
-                                break
-                        else:
-                            u1 = u
-                        for n in e.secondary.split():
-                            if not n.lower() in name:
-                                break
-                        else:
-                            u2 = u
                     with IntroModel() as model:
                         intro = model.get_event_intro(e.title)
-                        primary = model.get_primary_intro(u1.mention if u1 is not None else e.primary)
-                        secondary = model.get_secondary_intro(u2.mention if u2 is not None else e.secondary)
+                        primary = model.get_primary_intro(await self.get_crew_member(e.primary))
+                        secondary = model.get_secondary_intro(await self.get_crew_member(e.secondary))
                     await self.shift_channel.send(f"{intro} {primary} {secondary}")
-                    
+    
+    async def get_crew_member(self, name: str) -> str:
+        crew_role = None
+        for r in self.shift_channel.guild.roles:
+            if r.name == "Crew":
+                print("Found crew role")
+                crew_role = r
+                break
+        if crew_role is None:
+            return name
+        
+        for u in self.shift_channel.guild.members:
+            if not crew_role in u.roles:
+                continue
+            for n in name.lower().split():
+                alias = u.nick.lower() if u.nick is not None else u.name.lower()
+                if not n in alias:
+                    break
+            else:
+                return u.mention
+        
+        return name
     
