@@ -1,5 +1,7 @@
 import asyncio
 from datetime import timedelta, datetime
+from functools import lru_cache
+from typing import Optional
 
 import discord
 
@@ -85,11 +87,8 @@ class ConnectBot(discord.Client):
             if not self.is_ready() or self.event_manager_channel is None:
                 return
             
-            for r in self.event_manager_channel.guild.roles:
-                if r.name == "Event Manager":
-                    role = r
-                    break
-            else:
+            em_role = self.get_role_by_name("Event Manager")
+            if em_role is None:
                 continue
 
             with EventModel() as model:
@@ -132,12 +131,7 @@ class ConnectBot(discord.Client):
                     await self.shift_channel.send(f"{intro} {primary} {secondary}")
     
     async def get_crew_member(self, name: str) -> str:
-        crew_role = None
-        for r in self.shift_channel.guild.roles:
-            if r.name == "Crew":
-                print("Found crew role")
-                crew_role = r
-                break
+        crew_role = self.get_role_by_name("Crew")
         if crew_role is None:
             return name
         
@@ -152,4 +146,11 @@ class ConnectBot(discord.Client):
                 return u.mention
         
         return name
+    
+    @lru_cache(maxsize=3)
+    async def get_role_by_name(self, name: str) -> Optional[discord.Role]:
+        for r in self.shift_channel.guild.roles:
+            if r.name == name:
+                return r
+        return None
     
