@@ -87,7 +87,7 @@ class ConnectBot(discord.Client):
             if not self.is_ready() or self.event_manager_channel is None:
                 return
             
-            em_role = self.get_role_by_name("Event Manager")
+            em_role = await self.get_role_by_name("Event Manager")
             if em_role is None:
                 continue
 
@@ -102,7 +102,7 @@ class ConnectBot(discord.Client):
                 continue
             
             await self.event_manager_channel.send(
-                f"{role.mention} there are {len(events)} event(s) next week:" +
+                f"{em_role.mention} there are {len(events)} event(s) next week:" +
                 "\n```" +
                 "\n".join([str(e) for e in events]) +
                 "```"
