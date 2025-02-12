@@ -144,8 +144,8 @@ class ConnectBot(discord.Client):
         for u in self.shift_channel.guild.members:
             if not crew_role in u.roles:
                 continue
+            alias = u.nick.lower() if u.nick is not None else u.name.lower()
             for n in name.lower().split():
-                alias = u.nick.lower() if u.nick is not None else u.name.lower()
                 if not n in alias:
                     break
             else:
