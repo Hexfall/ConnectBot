@@ -22,6 +22,6 @@ def events_in_range(events: list[Event], start: datetime, end: datetime) -> list
 
 def next_sunday() -> datetime:
     d = datetime.today() + timedelta(days=1)
-    while d.weekday() != 0:
+    while d.weekday() != 6:
         d += timedelta(days=1)
     return d
