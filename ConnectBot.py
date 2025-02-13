@@ -131,7 +131,7 @@ class ConnectBot(discord.Client):
                     await self.shift_channel.send(f"{intro} {primary} {secondary}")
     
     async def get_crew_member(self, name: str) -> str:
-        crew_role = self.get_role_by_name("Crew")
+        crew_role = await self.get_role_by_name("Crew")
         if crew_role is None:
             return name
         
