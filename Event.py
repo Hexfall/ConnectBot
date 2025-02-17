@@ -11,7 +11,14 @@ class Event:
         self.secondary = secondary
     
     def __str__(self) -> str:
-        return f"{self.weekday:>9}   {self.date.strftime('%m/%d'):>5} {self.title:>10}   {self.room:>6}"
+        return f"{self.weekday:>9}   {self.date.strftime('%m/%d'):>5} {self.title:>10}   {self.room:>7}"
+
+    def long_format(self):
+        return f"{self.weekday:>9}   {self.date.strftime('%m/%d'):>5} {self.title:>10}   {self.room:>7} {self.primary:>10} {self.secondary:>10}"
+    
+    @staticmethod
+    def long_format_header():
+        return f"{'Week Day':>9}   {'Date':>5} {'Event':>10}   {'Room':>7} {'Games':>10} {'Snacks':>10}"
 
 def create_event(weekday: str, date: str, title: str, room: str, primary: str, secondary: str) -> Event:
     d = datetime.strptime(date + "/" + str(datetime.now().year), "%d/%m/%Y")

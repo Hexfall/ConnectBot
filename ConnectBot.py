@@ -15,6 +15,17 @@ MINUTE = 60
 HOUR = MINUTE * 60
 DAY = 24 * HOUR
 
+
+def user_is_member(user: discord.Member, name: str) -> bool:
+    alias = user.nick.lower() if user.nick is not None else user.name.lower()
+    for n in name.lower().split():
+        if not n in alias:
+            break
+    else:
+        return True
+    return False
+
+
 class ConnectBot(discord.Client):
     def __init__(self, intents: discord.Intents):
         super().__init__(intents=intents)
@@ -60,10 +71,7 @@ class ConnectBot(discord.Client):
         if text.startswith("help"):
             pass
         elif text.startswith("bind"):
-            role = None
-            for r in message.guild.roles:
-                if r.name == "President":
-                    role = r
+            role = await self.get_role_by_name("President")
             if role is None or not role in message.author.roles:
                 await message.reply("Only the president can use this command.")
                 return
@@ -73,6 +81,8 @@ class ConnectBot(discord.Client):
             elif text.endswith("event_manager_channel"):
                 self.set_event_manager_channel(message.channel)
                 await message.add_reaction("👍")
+        elif text.startswith("next"):
+            await self.show_shifts(message)
 
     async def event_manager_cycle(self) -> None:
         sleep_until = next_sunday()
@@ -138,11 +148,7 @@ class ConnectBot(discord.Client):
         for u in self.shift_channel.guild.members:
             if not crew_role in u.roles:
                 continue
-            alias = u.nick.lower() if u.nick is not None else u.name.lower()
-            for n in name.lower().split():
-                if not n in alias:
-                    break
-            else:
+            if user_is_member(u, name):
                 return u.mention
         
         return name
@@ -153,4 +159,16 @@ class ConnectBot(discord.Client):
             if r.name == name:
                 return r
         return None
+
+
+    async def show_shifts(self, message):
+        print(f"Showing shifts for user {message.author.display_name}")
+        u = self.shift_channel.guild.get_member(message.author.id)
+        with EventModel() as model:
+            events = events_in_range(model.events, datetime.now(), datetime.now() + timedelta(days=185))
+        events = [e.long_format() for e in events if user_is_member(u, e.primary) or user_is_member(u, e.secondary)]
+        if len(events) == 0:
+            await message.reply("You have no shift remaining in the semester. Congratulations on your freedom")
+        else:
+            await message.reply(f"Your future shifts are:\n```{'\n'.join([Event.long_format_header()] + events)}```")
     
