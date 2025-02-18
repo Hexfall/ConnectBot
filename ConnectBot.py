@@ -155,7 +155,6 @@ class ConnectBot(discord.Client):
         
         return name
     
-    @lru_cache(maxsize=3)
     async def get_role_by_name(self, name: str) -> Optional[discord.Role]:
         for r in self.shift_channel.guild.roles:
             if r.name == name:
