@@ -65,6 +65,8 @@ class ConnectBot(discord.Client):
         if message.content.startswith(PREFIX):
             text = message.content[len(PREFIX):].strip()
             await self.parse_message(message, text)
+        elif message.guild is None:
+            await self.parse_message(message, message.content)
 
     async def parse_message(self, message: discord.message.Message, text: str):
         print(f'Parsing message: {message.content}')
