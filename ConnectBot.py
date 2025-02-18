@@ -71,7 +71,7 @@ class ConnectBot(discord.Client):
     async def parse_message(self, message: discord.message.Message, text: str):
         print(f'Parsing message: {message.content}')
         if text.startswith("help"):
-            pass
+            await message.channel.send("help - this\nbind shift_channel - sets channel for shift updates (can only be done by president)\nbind event_manager_channel - sets channel for event manager updates (can only be done by president)\nnext - shows events in the future where requester is scheduled to work")
         elif text.startswith("bind"):
             role = await self.get_role_by_name("President")
             if role is None or not role in message.author.roles:
