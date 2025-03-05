@@ -11,10 +11,13 @@ class Event:
         self.secondary = secondary
     
     def __str__(self) -> str:
-        return f"{self.weekday:>9}   {self.date.strftime('%m/%d'):>5} {self.title:>10}   {self.room:>7}"
+        return f"{self.weekday:>9}   {self.date.strftime('%d/%m'):>5} {self.title:>10}   {self.room:>7}"
 
-    def long_format(self):
-        return f"{self.weekday:>9}   {self.date.strftime('%m/%d'):>5} {self.title:>10}   {self.room:>7} {self.primary:>10} {self.secondary:>10}"
+    def __repr__(self) -> str:
+        return str(self)
+
+    def long_format(self) -> str:
+        return f"{str(self)} {self.primary:>10} {self.secondary:>10}"
     
     @staticmethod
     def long_format_header():
